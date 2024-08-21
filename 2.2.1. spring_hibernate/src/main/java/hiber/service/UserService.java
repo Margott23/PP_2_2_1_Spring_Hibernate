@@ -16,5 +16,5 @@ public interface UserService {
 
     User getUserByCar(String model, Integer series);
 
-    public void setCarByUser(User user, Car car);
+    void setCarByUser(User user, Car car);
 }
