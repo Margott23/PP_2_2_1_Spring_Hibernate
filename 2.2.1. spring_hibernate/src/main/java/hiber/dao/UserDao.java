@@ -14,7 +14,7 @@ public interface UserDao {
 
     void deleteUser(User user);
 
-    void addCar(Car car);
-
     User getUserByCar(String model, Integer series);
+
+    public void setCarByUser(User user, Car car);
 }

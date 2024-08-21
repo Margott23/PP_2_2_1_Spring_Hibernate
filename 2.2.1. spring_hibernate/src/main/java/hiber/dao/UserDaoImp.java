@@ -14,8 +14,12 @@ import java.util.List;
 @Repository
 public class UserDaoImp implements UserDao {
 
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    private SessionFactory sessionFactory;
+    public UserDaoImp(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public void addUser(User user) {
@@ -23,30 +27,22 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<User> listUsers() {
-        TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("from User");
+        TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("from User", User.class);
         return query.getResultList();
     }
 
     @Override
     public User getUser(String username) {
-        Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select u from User u where u.firstName=:username");
+        TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("select u from User u where u.firstName=:username", User.class);
         query.setParameter("username", username);
-        return (User) query.uniqueResult();
+        return query.getSingleResult();
     }
 
     @Override
     public void deleteUser(User user) {
         sessionFactory.getCurrentSession().delete(user.getCar());
         sessionFactory.getCurrentSession().delete(user);
-    }
-
-
-    @Override
-    public void addCar(Car car) {
-        sessionFactory.getCurrentSession().save(car);
     }
 
     @Override
@@ -57,10 +53,16 @@ public class UserDaoImp implements UserDao {
                     "and c.series = :series", Car.class);
             query.setParameter("model", model);
             query.setParameter("series", series);
-            Car car = (Car) query.uniqueResult();
+            Car car = query.uniqueResult();
             return car.getUser();
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    @Override
+    public void setCarByUser(User user, Car car) {
+        user.setCar(car);
+        sessionFactory.getCurrentSession().saveOrUpdate(user);
     }
 }
