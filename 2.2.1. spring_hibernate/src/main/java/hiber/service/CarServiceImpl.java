@@ -30,6 +30,7 @@ public class CarServiceImpl implements CarService {
         return carDao.listCars();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Car getCar(String model) {
         return carDao.getCar(model);
